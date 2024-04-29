@@ -1,0 +1,194 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Checkout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .item-info img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .item-name {
+            font-weight: bold;
+        }
+
+        .item-price {
+            margin-left: auto;
+            font-size: 1.2em;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Cart</h2>
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <div class="item-info">
+                <img src="{{ item.item_name.image.url }}" alt="Item Image">
+                <div class="item-info">
+                    <p class="item-name">{{ item.item_name }}</p>
+                </div>
+                <a href="#" class="add-to-cart" data-id="{{ item.item_name.id }}" data-url="{% url 'add_to_cart' item.item_name.id %}">Add to Cart</a>
+                <label id="qty-{{ item.item_name.id }}" >0</label>
+                <p class="item-price"> x $ {{ item.item_name.price }} = </p>
+                <a href="#" class="decrease_cart" data-id="{{ item.item_name.id }}" data-url="{% url 'delete_to_cart' item.item_name.id %}">Delete to Cart</a>
+        </div>     
+                    
+    </div>
+        {% endfor %}
+
+         <div>
+                    <ul>
+                        <li style="list-style-type: none;">
+                         Subtotal
+                        <span class="price float-right">
+                         <span class="currency">$</span>
+                         <span id="subtotal">{{ subtotal }}</span>
+                         </span>
+                         </li>
+
+                        <li style="list-style-type: none; font-weight: 600;">
+                        TOTAL
+                        <span class="price float-right">
+                        <span class="currency">$</span>
+                         <span id="total">{{ grand_total }}</span>
+                        </span>
+                        </li>
+                    </ul>
+                </div> 
+        
+        {% for item in cart_items %}
+    
+         <span id="qty-{{ item.item_name.id }}" class="item_qty d-none" data-qty="{{item.quantity}}">{{item.quantity}}</span>
+        
+    
+        {% endfor %}
+
+    
+        
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart').click(function() {
+            
+            itemId = $(this).attr('data-id');
+            url = $(this).attr('data-url');
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success :function (response){
+                    console.log(response.cart_counter['cart_count'])
+                    $('#cart_counter').html(response.cart_counter['cart_count']);
+                    $('#qty-' + itemId).html(response.qty);
+
+                    applyCartAmounts(
+                        response.cart_amount['subtotal'],
+                        // response.cart_amount['tax_dict'],
+                        response.cart_amount['grand_total']
+                    );
+                }
+            });
+
+        });
+        // place the cart item quantity on load
+        $('.item_qty').each(function(){
+            var the_id = $(this).attr('id')
+            var qty = $(this).attr('data-qty')
+            $('#'+the_id).html(qty)
+        });
+
+        $('.decrease_cart').click(function() {
+            
+            itemId = $(this).attr('data-id');
+            url = $(this).attr('data-url');
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success :function (response){
+                    console.log(response.cart_counter['cart_count'])
+                    $('#cart_counter').html(response.cart_counter['cart_count'])
+                    $('#qty-' + itemId).html(response.qty)
+
+
+                    applyCartAmounts(
+                        response.cart_amount['subtotal'],
+                        // response.cart_amount['tax_dict'],
+                        response.cart_amount['grand_total']
+                    );
+                }
+            });
+        });
+
+        function applyCartAmounts(subtotal, grand_total){
+            if(window.location.pathname == '/cart/'){
+                $('#subtotal').html(subtotal)
+                $('#total').html(grand_total)
+            }
+        }
+    });
+</script>
+
+
+
+        <a href="{% url 'checkout' %}" class="checkout-btn">Checkout</a>
+    </div>
+</body>
+</html>
+{% endblock content %}

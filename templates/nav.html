@@ -1,0 +1,48 @@
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <!-- Brand -->
+    <a class="navbar-brand pl-5 ml-5" href="#">E-Commerce</a>
+
+    <!-- Toggler/collapsibe Button -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar links -->
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav ml-auto">
+
+            {% if  user.is_authenticated %}
+
+            <li class="nav-item dropdown pr-5 mr-5">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ user.username }}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item pr-10" href="#">Edit Profile</a>
+                  <a class="dropdown-item pr-10" href="#">Orders</a>
+                  <a class="dropdown-item pr-10" href="#">Logout</a>
+                </div>
+                <a href="{% url 'cart' %}">
+                    <i class="fa fa-shopping-cart text-danger" style="font-size: 20px;">Cart</i>
+                    <span class="badge badge-warning" id="cart_counter" style="border-radius: 50px; position: relative; bottom:10px; left: -5px;">{{ cart_count }}</span>
+                </a>
+              </li>
+
+
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "login-user" %}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "register-user" %}">Register</a>
+            </li>
+            {% comment %} <li class="nav-item">
+                <a class="nav-link" href="#">About Us</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Contact</a>
+            </li> {% endcomment %}
+            {% endif %}
+        </ul>
+    </div>
+</nav>

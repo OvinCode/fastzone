@@ -1,0 +1,93 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<div class="container-fluid pl-5 ml-5 pt-5 mr-5 ml-5">
+    <h2>Welcome to Our E-Commerce Store</h2>
+    
+    
+
+    <p>Explore our wide range of products and find the perfect items for you.</p>
+
+    
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-1 ">
+        {% for item in items.all %}
+        <div class="col pb-4 mr-1">
+            <div class="card h-100 " style="width: 100%;">
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text">{{ item.description }}</p>
+                    <p class="card-text">Price: ${{ item.price }}</p>
+                    <a href="#" class="add-to-cart" data-id="{{ item.id }}" data-url="{% url 'add_to_cart' item.id %}">Add to Cart</a>
+                    <label id="qty-{{ item.id }}" >0</label>
+                    <a href="#" class="decrease_cart" data-id="{{ item.id }}" data-url="{% url 'delete_to_cart' item.id %}">Delete to Cart</a>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+       
+            {% for item in cart_items %}
+    
+            <span id="qty-{{ item.item_name.id }}" class="item_qty d-none" data-qty="{{item.quantity}}">{{item.quantity}}</span>
+        
+            {% endfor %}
+        
+    </div>
+
+
+    
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart').click(function() {
+            
+            itemId = $(this).attr('data-id');
+            url = $(this).attr('data-url');
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success :function (response){
+                    console.log(response.cart_counter['cart_count'])
+                    $('#cart_counter').html(response.cart_counter['cart_count'])
+                    $('#qty-' + itemId).html(response.qty)
+                }
+            });
+        });
+
+        // place the cart item quantity on load
+        $('.item_qty').each(function(){
+            var the_id = $(this).attr('id')
+            var qty = $(this).attr('data-qty')
+            $('#'+the_id).html(qty)
+        });
+
+
+        $('.decrease_cart').click(function() {
+            
+            itemId = $(this).attr('data-id');
+            url = $(this).attr('data-url');
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                success :function (response){
+                    console.log(response.cart_counter['cart_count'])
+                    $('#cart_counter').html(response.cart_counter['cart_count'])
+                    $('#qty-' + itemId).html(response.qty)
+                }
+            });
+        });
+
+    })
+</script>
+
+
+
+{% endblock content %}
